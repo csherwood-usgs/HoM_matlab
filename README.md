@@ -15,13 +15,21 @@ This will reside in ..\proj\2019_CACO_CoastCam\HoM_matlab
 `averageall.m` - Pixel-wise average image of all image files in a folder  
 `animate_oblique_timex.m` - Make an .mp4 movie of all the distorted timex images in a folder  
 `animate_rectified_timex.m` - Make an .mp4 movie of two-camera rectified imagery in  a folder  
+`animate_rectifed_timex_waves_tides.m` - Make .avi movie of two-camear rectified imagery  
+`imageRectifier_CRS.m` - Custom version of CIRN routine  
+`rectificationPlotter_CRS.m` - Custom version of CIRN routine  
+`cameraSeamBlend_CRS.m` - Custom version of CIRN routine  
 
 
 
 ### Functions
 `findNearest.m` - Finds nearest value and index of value in an array  
 `estimate_sharpness.m` - Calculates an index related to pixel contrast  
-`imageRectifier_CRS.m` - Does rectification and makes plot
+`imageRectifier_CRS.m` - Does rectification and makes plot  
+`bwdistsc.m` - Replaced Matlab Toolbox function bwdist in `cameraSeamBlend`  
 
 ### Data
 `HoM tides.mat` - Time series of predicted tides, Dec'19 - Sept'20  
+`44018.mat` - Time series of met and wave data from NDCB 44018, 2019 - June '20  
+`CACO01_C1_IOEOBest.mat` - Best version of camera 1 internal and external calibration  
+`CACO01_C2_IOEOBest.mat` - Best version of camera 2 internal and external calibration  

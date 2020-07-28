@@ -130,7 +130,7 @@ for k=1:camnum
     clear ir
 end
 %% Section 5: Merge rectifications of multiple cameras
-Ir=cameraSeamBlend(IrIndv);
+Ir=cameraSeamBlend_CRS(IrIndv);
 
 %% Section 6: Optional for Teaching Mode
 
@@ -138,7 +138,7 @@ if teachingMode==1
     for k=1:camnum    
         % Plot Rectified Image only if Matrix Input
         if s(2)>1
-            rectificationPlotter(Ir,X,Y,1)
+            rectificationPlotter_CRS(Ir,X,Y,1)
         end
     end
     

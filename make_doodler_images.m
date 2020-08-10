@@ -1,4 +1,4 @@
-% animate_rectified_timex_waves_tides.m - Demo of a way to animage rectified images
+% make_doodler_images.m - Make recified images with no annotation.
 clear
 close all
 % path to where I have put all of the timex images
@@ -108,7 +108,7 @@ for i=1:length(c1files)
     
     % convert unix time into a datenum
     dn(i)=epoch2Matlab(epoch);
-    datestr(dn);
+    datestr(dn(i))
     % load the image
     have_both = 0;
     im1 = imread( [ppath,c1files(i).name], 'jpg');
@@ -182,8 +182,10 @@ for i=1:20:k
     I{1}=im1;
     I{2}=im2;
     
+    datm = datestr(dn(kk),'YYYYMMDD_HHmm');
+    plotName = sprintf('%s_%.0f_%.0f.tif',datm,10*M,10*Hslist(i+j-1))
     % show the image
-    [localIr]= imageRectifier_CRS(I,intrinsics,localExtrinsics,localX,localY,localZ,1);
+    [localIr]= imageRectifier_CRS_plain_plot(I,intrinsics,localExtrinsics,localX,localY,localZ,1,plotName);
     
     % make this a convenient size for digitizing - but keep the correct
     % width/height ratio
@@ -244,10 +246,13 @@ ylabel('Alongshore distance (m)')
 title('Interpolated Shorelines')
 print('smoothed_shorelines.png','-dpng')
 %% plot cross-shore shoreline location as a function of time
-figure(4)
+figure(4); clf
 subplot(411)
 i = find(yi==320);
 plot(dnc,xi(:,i))
+hold
+plot(dnc,xi(:,i),'o')
+grid on
 ylim([120 160])
 set(gca,'xticklabels',[])
 text(.03,.9,'y=320','units','normalized');

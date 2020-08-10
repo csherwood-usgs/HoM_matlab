@@ -1,4 +1,4 @@
-%% rectificationPlotter
+%% rectificationPlotter_CRS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  This function plots a rectified image in Matlab given a corresponding X
 %  and Y  meshgrid on the current axes. The user can plot it as an RGB
@@ -34,7 +34,7 @@ function rectificationPlotter_CRS(I,X,Y,imageFlag)
 %% Section 1: If RBG Image Is desired
 if imageFlag==1
     imagesc(X(1,:),Y(:,1),I) %imagesc assumes grid is valid meshgrid and
-    %only allows vector input
+    truesize([1000,1400]);
 end
 %% Section 2: If Pcolor Gray Image Is desired
 if imageFlag==0

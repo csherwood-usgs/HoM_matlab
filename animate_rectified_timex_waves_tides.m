@@ -94,7 +94,7 @@ end
 figure(1); clf
 
 % Set up video object
-v = VideoWriter('testavi2.avi','Motion JPEG AVI');
+v = VideoWriter('HoM_rect.avi','Motion JPEG AVI');
 v.Quality = 95;
 v.FrameRate = 5;
 open(v)
@@ -103,7 +103,7 @@ open(v)
 k=0
 % loop through some of the files (change 17 to length(c1files) after
 % debugging)
-for i=1:17 %length(c1files)
+for i=1:length(c1files)
     % grab the unix time from the file name
     epoch_str = c1files(i).name(1:10);
     epoch = str2num(epoch_str);

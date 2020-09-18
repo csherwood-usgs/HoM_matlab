@@ -34,12 +34,12 @@ print('fig2.png','-dpng')
 % % after some plotting and counting, I decided to clip out the retrograde part
 % % (m stands for monotonic)
 % TTm = [TT(1:2442) TT(2455:end)];
-% % which also means we have do the same for the data 
+% % which also means we have do the same for the data
 % Hs20m = [Hs20(1:2442) Hs20(2455:end)];
 % Tp20m = [Tp20(1:2442) Tp20(2455:end)];
 % Wdir20m = [Wdir20(1:2442) Wdir20(2455:end)];
 % zeta20m = [zeta20(1:2442) zeta20(2455:end)];
-% 
+%
 % % make a test dateunum for interpolation
 % dni = datenum('20-Mar-2020 10:30')
 % Hsi = interp1(TTm,Hs20m,dni)
@@ -79,9 +79,11 @@ for k=1:length(ioeopath)
     %  World Extrinsics
     extrinsics{k}=extrinsics{k};
     %  Local Extrinsics
-    localExtrinsics{k} = localTransformExtrinsics(localOrigin,localAngle,1,extrinsics{k});
+    localExtrinsics{k} = localTransformExtrinsics(localOrigin,localAngle,1,extrinsics{k})
 end
-
+disp(extrinsics{1})
+disp(localExtrinsics{1})
+%%
 %  Create Equidistant Input Grid
 [iX iY]=meshgrid([ixlim(1):idxdy:ixlim(2)],[iylim(1):idxdy:iylim(2)]);
 
@@ -164,10 +166,10 @@ for i=1:length(c1files)
     Wdir = interp1(TT,Wdir20,dn(i));
     
     % add image to list if meets criteria
-    if(a>40 && s>0.8 && have_both && zeta > 1.2)
+    if(a>40 && s>0.8 && have_both && zeta<=1.2 && zeta >= 1.0)
         k=k+1
         ilist(k)=i;     % list of indexes in file directory
-        zetalist(k)=zeta; 
+        zetalist(k)=zeta;
         Hslist(k)=Hs;
         Tplist(k)=Tp;
         Wdirlist(k)=Wdir;
@@ -210,7 +212,7 @@ for i=1:20:k
     catch
         disp(['No match for ',epoch])
     end
-       
+    
     I{1}=im1;
     I{2}=im2;
     
@@ -233,8 +235,10 @@ for i=1:20:k
     Hsc(jj)=Hs20(kk);
     Tpc(jj)=Tp20(kk);
     Wdirc(jj)=Wdir20(kk);
-    zetac(jj)=zeta20(kk);    
+    zetac(jj)=zeta20(kk);
 end
+%% save what you have digitized
+save('coastline_zeta_1to1pt1.mat','dnc','Hsc','Tpc','Wdirc','zetac','C')
 %% plot digitized data
 figure(2); clf
 % plot the shorelines
@@ -253,24 +257,58 @@ print('digitized_shorelines.png','-dpng')
 yi = 60:2:400;
 xi = NaN*ones(length(C),length(yi));
 figure(3); clf
+
+% plot last image
+
+[localIr]= imageRectifier_CRS(I,intrinsics,localExtrinsics,localX,localY,localZ,1);
+
+% make this a convenient size for digitizing - but keep the correct
+% width/height ratio
+truesize(gcf,[.75*500, .75*700])
+hold on
 for i = 1:length(C)
     A=C{i};
-    xi(i,:) = interp1(A(:,2),A(:,1),yi,'spline');
+    xi(i,:) = interp1(A(:,2),A(:,1),yi);
 end
 
-figure(3); clf
-plot([110 160],[320 320],'--','color',[.7 .7 .7])
+plot([100 200],[320 320],'--','color',[.7 .7 .7])
 hold on
-plot([110 160],[240 240],'--','color',[.7 .7 .7])
-plot([110 160],[160 160],'--','color',[.7 .7 .7])
-plot([110 160],[80 80],'--','color',[.7 .7 .7])
+plot([100 200],[240 240],'--','color',[.7 .7 .7])
+plot([100 200],[160 160],'--','color',[.7 .7 .7])
+plot([100 200],[80 80],'--','color',[.7 .7 .7])
 
 cmap = parula(length(C));
 for i = 1:length(C)
     plot(xi(i,:),yi,'-','linewidth',2,'color',cmap(i,:))
     hold on
 end
-xlim([110 160])
+%xlim([110 160])
+h=colorbar;
+h.Ticks = [0 1];
+s1 = datestr(dnc(1),1)
+s2 = datestr(dnc(length(C)),1)
+h.TickLabels = [s1; s2]
+xlabel('Cross-shore distance (m)')
+ylabel('Alongshore distance (m)')
+title('Interpolated Shorelines')
+print('smoothed_shorelines_background.png','-dpng')
+%%
+figure(4); clf
+
+sst = 110;
+sse = 180;
+plot([sst sse],[320 320],'--','color',[.7 .7 .7])
+hold on
+plot([sst sse],[240 240],'--','color',[.7 .7 .7])
+plot([sst sse],[160 160],'--','color',[.7 .7 .7])
+plot([sst sse],[80 80],'--','color',[.7 .7 .7])
+
+cmap = parula(length(C));
+for i = 1:length(C)
+    plot(xi(i,:),yi,'-','linewidth',2,'color',cmap(i,:))
+    hold on
+end
+xlim([sst sse])
 h=colorbar;
 h.Ticks = [0 1];
 s1 = datestr(dnc(1),1)
@@ -281,6 +319,9 @@ ylabel('Alongshore distance (m)')
 title('Interpolated Shorelines')
 print('smoothed_shorelines.png','-dpng')
 %% plot cross-shore shoreline location as a function of time
+ds = datenum('15-Jan-2020')
+de = datenum('15-May=2020')
+
 figure(4); clf
 subplot(411)
 i = find(yi==320);
@@ -289,6 +330,7 @@ hold
 plot(dnc,xi(:,i),'o')
 grid on
 ylim([120 160])
+xlim([ds de])
 set(gca,'xticklabels',[])
 text(.03,.9,'y=320','units','normalized');
 title('Shoreline Position Over Time')
@@ -296,7 +338,11 @@ title('Shoreline Position Over Time')
 subplot(412)
 i = find(yi==240);
 plot(dnc,xi(:,i))
+hold
+plot(dnc,xi(:,i),'o')
+xlim([ds de])
 ylim([120 160])
+grid on
 set(gca,'xticklabels',[])
 ylabel('Cross-shore Location (m)')
 text(.03,.9,'y=240','units','normalized');
@@ -304,15 +350,20 @@ text(.03,.9,'y=240','units','normalized');
 subplot(413)
 i = find(yi==160);
 plot(dnc,xi(:,i))
+hold
+plot(dnc,xi(:,i),'o')
+xlim([ds de])
 ylim([120 160])
+grid on
 set(gca,'xticklabels',[])
 text(.03,.9,'y=160','units','normalized');
 
 subplot(414)
-i = find(yi==80);
-plot(dnc,xi(:,i))
-ylim([120 160])
-text(.03,.9,'y=180','units','normalized');
+plot(TT,Hs20)
+xlim([ds de])
+ylim([0 6])
+grid on
+text(.03,.9,'Hs','units','normalized');
 datetick('x',6,'keeplimits','keepticks')
 print('shoreline_time_series.png','-dpng')
 
